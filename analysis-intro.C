@@ -45,7 +45,6 @@ void analysis::Loop()
     Long64_t nbytes = 0, nb = 0;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
         //if (jentry > 10000) break; to check earlier
-        if (jentry > 10000) break;
         Long64_t ientry = LoadTree(jentry);
         if (jentry%10000==0) cout<< jentry << " out of " << nentries << endl ;
         if (ientry < 0) break;
