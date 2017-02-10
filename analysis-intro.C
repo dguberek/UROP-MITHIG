@@ -1,3 +1,5 @@
+//work towards fig 7 http://cds.cern.ch/record/2217884/files/HIN-16-002-pas.pdf, fig 3 https://arxiv.org/pdf/1310.0878.pdf
+
 #define analysis_cxx
 #include "analysis.h"
 #include <TH2.h>
