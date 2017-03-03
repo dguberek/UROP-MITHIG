@@ -1,7 +1,6 @@
 //this code creates the histogram for the lowest centrality bin (hiBin<20) and "signal" photons
 
-
-//#define analysis_cxx
+#define analysis_cxx
 #include "analysis.h"
 #include <TH2.h>
 #include <TStyle.h>
@@ -35,14 +34,20 @@ void analysis::Loop()
     //by  b_branchname->GetEntry(ientry); //read only this branch
     if (fChain == 0) return;
     using namespace std;
+    
     TFile * outputfile = new TFile("outfilename1.root","recreate");
-    TH1D * jetEphoE = new TH1D("jetEphoE","title;xaxis title;yaxis title",16,0,2);
+    TH1D * signalJetEphoE = new TH1D("signalJetEphoE","title;xaxis title;yaxis title",16,0,2);
+    TH1D * mix_signalJetEphoE = new TH1D("mix_signalJetEphoE","title;xaxis title;yaxis title",16,0,2);
+    TH1D * sidebandJetEphoE = new TH1D("sidebandJetEphoE","title;xaxis title;yaxis title",16,0,2);
+    TH1D * mix_sidebandJetEphoE = new TH1D("mix_sidebandJetEphoE","title;xaxis title;yaxis title",16,0,2);
     //TH1D * rhoR = new TH1D("rhoR","title;xaxis title;yaxis title",20,0,1);
     
     Long64_t nentries = fChain->GetEntriesFast();
     
-    int nphotons = 0;
+    int sig_nphotons = 0;
+    int side_nphotons = 0;
     bool signal;
+    bool sideband;
     
     Long64_t nbytes = 0, nb = 0;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -54,17 +59,47 @@ void analysis::Loop()
         if (phoNoise[jentry]==0) continue;
         if (phoEtCorrected[jentry] < 60 ) continue;
         signal = (phoSigmaIEtaIEta[jentry]<0.010);   //in the email, this has title phoSigmaIEtaIEta_2012, but I don't see this in analysis.h
-        if (!signal) continue;
-        nphotons++;
+        sideband = (phoSigmaIEtaIEta[jentry]>0.011 && phoSigmaIEtaIEta[jentry]<0.017);
+        if(!signal && !sideband) continue;
+        
+        if (signal) {
+        sig_nphotons++;
         if(hiBin>20) continue;  //should I modify for each centrality bin cut, or another loop to do all at once?
     
         
         for(int ijet = 0 ; ijet < njet ; ijet++) {
             if(jetpt[ijet]<30) continue;
             if(jeteta[ijet]>1.6) continue;
-            if(acos(cos(phoPhi[ijet]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;   //should index on pho variables be jentry?
-            jetEphoE->Fill(jetpt[ijet]/phoEtCorrected[ijet]);
+            if(acos(cos(phoPhi[ijet]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;   //should index on pho variables be jentry? check in each block
+            signalJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[ijet]);
+        }
             
+        for(int ijet = 0 ; ijet < njet ; ijet++) {
+            if(jetpt_mix[ijet]<30) continue;
+            if(jeteta_mix[ijet]>1.6) continue;
+            if(acos(cos(phoPhi[ijet]-jetphi_mix[ijet]))<(7.0*3.14/8.0)) continue;
+            mix_signalJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[ijet]);
+        }
+        }
+        
+        if (sideband) {
+            side_nphotons++;
+            if(hiBin>20) continue;
+            
+            for(int ijet = 0 ; ijet < njet ; ijet++) {
+                if(jetpt[ijet]<30) continue;
+                if(jeteta[ijet]>1.6) continue;
+                if(acos(cos(phoPhi[ijet]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;
+                sidebandJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[ijet]);
+            }
+            
+            for(int ijet = 0 ; ijet < njet ; ijet++) {
+                if(jetpt_mix[ijet]<30) continue;
+                if(jeteta_mix[ijet]>1.6) continue;
+                if(acos(cos(phoPhi[ijet]-jetphi_mix[ijet]))<(7.0*3.14/8.0)) continue;
+                mix_sidebandJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[ijet]);
+            }
+        }
             //for(int iTrk = 0; iTrk < nTrk; iTrk++) {
                 //double dr;
                 //double dPhi = acos(cos(jetphi[ijet]-trkPhi[iTrk]));
@@ -73,15 +108,17 @@ void analysis::Loop()
                 //rhoR->Fill(dr,trkPt[iTrk]/jetpt[ijet]); // Fill(what you plot, how you weight)
                 
             //}
-        }
+    
     }
     
-    jetEphoE->Scale(1.0/(nphotons*(2.0/16.0)));
+    signalJetEphoE->Scale(1.0/(sig_nphotons*(2.0/16.0)));
+    mix_signalJetEphoE->Scale(1.0/(sig_nphotons*(2.0/16.0)));
+    sidebandJetEphoE->Scale(1.0/(side_nphotons*(2.0/16.0)));
+    mix_sidebandJetEphoE->Scale(1.0/(side_nphotons*(2.0/16.0)));
     outputfile->Write();
     outputfile->Close();
     
-    // jetEphoE->Write();
-    // jetEphoE->Close();
+   //how is the outputfile filled with all the generated data?
 }
 
 
