@@ -1,5 +1,4 @@
 //this code creates the histogram for the lowest centrality bin (hiBin<20) and "signal" photons
-
 #define analysis_cxx
 #include "analysis.h"
 #include <TH2.h>
@@ -36,10 +35,10 @@ void analysis::Loop()
     using namespace std;
     
     TFile * outputfile = new TFile("outfilename1.root","recreate");
-    TH1D * signalJetEphoE = new TH1D("signalJetEphoE","title;xaxis title;yaxis title",16,0,2);
-    TH1D * mix_signalJetEphoE = new TH1D("mix_signalJetEphoE","title;xaxis title;yaxis title",16,0,2);
-    TH1D * sidebandJetEphoE = new TH1D("sidebandJetEphoE","title;xaxis title;yaxis title",16,0,2);
-    TH1D * mix_sidebandJetEphoE = new TH1D("mix_sidebandJetEphoE","title;xaxis title;yaxis title",16,0,2);
+    TH1D * signalJetEphoE = new TH1D("signalJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
+    TH1D * mix_signalJetEphoE = new TH1D("mix_signalJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
+    TH1D * sidebandJetEphoE = new TH1D("sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
+    TH1D * mix_sidebandJetEphoE = new TH1D("mix_sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
     //TH1D * rhoR = new TH1D("rhoR","title;xaxis title;yaxis title",20,0,1);
     
     Long64_t nentries = fChain->GetEntriesFast();
@@ -56,10 +55,10 @@ void analysis::Loop()
         if (jentry%10000==0) cout<< jentry << " out of " << nentries << endl ;
         if (ientry < 0) break;
         nb = fChain->GetEntry(jentry);   nbytes += nb;
-        if (phoNoise[jentry]==0) continue;
-        if (phoEtCorrected[jentry] < 60 ) continue;
-        signal = (phoSigmaIEtaIEta[jentry]<0.010);   //in the email, this has title phoSigmaIEtaIEta_2012, but I don't see this in analysis.h
-        sideband = (phoSigmaIEtaIEta[jentry]>0.011 && phoSigmaIEtaIEta[jentry]<0.017);
+        if (phoNoise[0]==0) continue;
+        if (phoEtCorrected[0] < 60 ) continue;
+        signal = (phoSigmaIEtaIEta_2012[0]<0.010);
+        sideband = (phoSigmaIEtaIEta_2012[0]>0.011 && phoSigmaIEtaIEta_2012[jentry]<0.017);
         if(!signal && !sideband) continue;
         
         if (signal) {
@@ -70,15 +69,15 @@ void analysis::Loop()
         for(int ijet = 0 ; ijet < njet ; ijet++) {
             if(jetpt[ijet]<30) continue;
             if(jeteta[ijet]>1.6) continue;
-            if(acos(cos(phoPhi[ijet]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;   //should index on pho variables be jentry? check in each block
-            signalJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[ijet]);
+            if(acos(cos(phoPhi[0]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;
+            signalJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[0]);
         }
             
         for(int ijet = 0 ; ijet < njet ; ijet++) {
             if(jetpt_mix[ijet]<30) continue;
             if(jeteta_mix[ijet]>1.6) continue;
-            if(acos(cos(phoPhi[ijet]-jetphi_mix[ijet]))<(7.0*3.14/8.0)) continue;
-            mix_signalJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[ijet]);
+            if(acos(cos(phoPhi[0]-jetphi_mix[0]))<(7.0*3.14/8.0)) continue;
+            mix_signalJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[0]);
         }
         }
         
@@ -89,15 +88,15 @@ void analysis::Loop()
             for(int ijet = 0 ; ijet < njet ; ijet++) {
                 if(jetpt[ijet]<30) continue;
                 if(jeteta[ijet]>1.6) continue;
-                if(acos(cos(phoPhi[ijet]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;
-                sidebandJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[ijet]);
+                if(acos(cos(phoPhi[0]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;
+                sidebandJetEphoE->Fill(jetpt[ijet]/phoEtCorrected[0]);
             }
             
             for(int ijet = 0 ; ijet < njet ; ijet++) {
                 if(jetpt_mix[ijet]<30) continue;
                 if(jeteta_mix[ijet]>1.6) continue;
-                if(acos(cos(phoPhi[ijet]-jetphi_mix[ijet]))<(7.0*3.14/8.0)) continue;
-                mix_sidebandJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[ijet]);
+                if(acos(cos(phoPhi[0]-jetphi_mix[ijet]))<(7.0*3.14/8.0)) continue;
+                mix_sidebandJetEphoE->Fill(jetpt_mix[ijet]/phoEtCorrected[0]);
             }
         }
             //for(int iTrk = 0; iTrk < nTrk; iTrk++) {
