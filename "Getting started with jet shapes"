@@ -84,7 +84,7 @@ void analysis::Loop()
                 if (phoNoise[0]==0) continue;
                 if (phoEtCorrected[0] < 60 ) continue;
                 signal = (phoSigmaIEtaIEta_2012[0]<0.010);
-                sideband = (phoSigmaIEtaIEta_2012[0]>0.011 && phoSigmaIEtaIEta_2012[jentry]<0.017);
+                sideband = (phoSigmaIEtaIEta_2012[0]>0.011 && phoSigmaIEtaIEta_2012[0]<0.017);
                 if(!signal && !sideband) continue;
         
         
