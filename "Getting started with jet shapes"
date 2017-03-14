@@ -6,6 +6,29 @@
 #include <TCanvas.h>
 #include <iostream>
 
+
+#include "makeMultiPanelCanvas.C"
+
+
+float allpuritypbpb[] = {0.725758, 0.720249, 0.753094, 0.703853, 0.730487, 0.756007, 0.741809, 0.737945, 0.725995, 0.786819, 0.704426, 0.743147, 0.775786, 0.827101, 0.715906, 0.710863, 0.739059, 0.687001, 0.719965, 0.743805, 0.720358, 0.724734, 0.719121, 0.758637, 0.699659, 0.73539, 0.76691, 0.731031, 0.730948, 0.717619, 0.786722, 0.695959, 0.733827, 0.771255, 0.836782, 0.749695, 0.739283, 0.788322, 0.711966, 0.763817, 0.786493, 0.816522, 0.733207, 0.719114, 0.785248, 0.705784, 0.734519, 0.769831, 0.84767, 0.772594, 0.766181, 0.802428, 0.720997, 0.80606, 0.822834, 0.774406};
+float allpuritypp[] = {0.823368, 0.823368, 0.823368, 0.823368, 0.823368, 0.823368, 0.823368, 0.846154, 0.846154, 0.846154, 0.846154, 0.846154, 0.846154, 0.846154, 0.820975, 0.820975, 0.820975, 0.820975, 0.820975, 0.820975, 0.820975, 0.830048, 0.830048, 0.830048, 0.830048, 0.830048, 0.830048, 0.830048, 0.846293, 0.846293, 0.846293, 0.846293, 0.846293, 0.846293, 0.846293, 0.859037, 0.859037, 0.859037, 0.859037, 0.859037, 0.859037, 0.859037, 0.863744, 0.863744, 0.863744, 0.863744, 0.863744, 0.863744, 0.863744, 0.857244, 0.857244, 0.857244, 0.857244, 0.857244, 0.857244, 0.857244};
+
+float getpurity(float phoetmin, float hibinmin, bool ispp)
+{
+    int row = -1;
+    int col = -1;
+    if(phoetmin==40)  row = 0;
+    if(phoetmin==60)  row = 1;
+    if(phoetmin==100) row = 7;
+    if(hibinmin==0)   col = 3;
+    if(hibinmin==20)  col = 4;
+    if(hibinmin==60)  col = 5;
+    if(hibinmin==100) col = 6;
+    if(row>-1 && col > -1 && ispp) return allpuritypp[row*7+col];
+    if(row>-1 && col > -1 && !ispp) return allpuritypbpb[row*7+col];
+    return 1; //no purity applied
+}
+
 void analysis::Loop()
 {
     //   In a ROOT session, you can do:
@@ -48,6 +71,7 @@ void analysis::Loop()
     int lowBinBound, highBinBound;
     bool signal;
     bool sideband;
+    float purities[4];
     
 
     for(int iBin = 0; iBin < 4; iBin++) {
@@ -58,18 +82,22 @@ void analysis::Loop()
         if (iBin==0)    {
             lowBinBound = 0;
             highBinBound = 20;
+            purities[iBin] = getpurity(60.0, lowBinBound, false);
         }
         if (iBin==1)    {
             lowBinBound = 20;
             highBinBound = 60;
+            purities[iBin] = getpurity(60.0, lowBinBound, false);
         }
         if (iBin==2)    {
             lowBinBound = 60;
             highBinBound = 100;
+            purities[iBin] = getpurity(60.0, lowBinBound, false);
         }
         if (iBin==3)    {
             lowBinBound = 100;
             highBinBound = 200;
+            purities[iBin] = getpurity(60.0, lowBinBound, false);
         }
 
     
@@ -99,13 +127,15 @@ void analysis::Loop()
                         if(acos(cos(phoPhi[0]-jetphi[ijet]))<(7.0*3.14/8.0)) continue;
                         signalJetEphoE[iBin]->Fill(jetpt[ijet]/phoEtCorrected[0]);
                     }
-            
+           
                     for(int ijet = 0 ; ijet < njet ; ijet++) {
                         if(jetpt_mix[ijet]<30) continue;
                         if(jeteta_mix[ijet]>1.6) continue;
                         if(acos(cos(phoPhi[0]-jetphi_mix[0]))<(7.0*3.14/8.0)) continue;
                         mix_signalJetEphoE[iBin]->Fill(jetpt_mix[ijet]/phoEtCorrected[0]);
                     }
+                    
+                    
                 }
         
                 if (sideband) {
@@ -134,6 +164,7 @@ void analysis::Loop()
             mix_sidebandJetEphoE[iBin]->Scale(1.0/(side_nphotons*(2.0/16.0)));
         }
 
+//for a=signal-signalmix do I loop through each histogram and subtract, or how do i implement? (already have array of purities)
     
     }
     
