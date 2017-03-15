@@ -34,8 +34,8 @@ void analysis::Loop(int centmin, int centmax)
     if (fChain == 0) return;
     using namespace std;
 
-    TFile * outputfile = new TFile("outfilename1.root","recreate");
-    TH1D * signalJetEphoE = new TH1D("signalJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
+    TFile * outputfile = new TFile(Form("outfilename1_cent%d_%d.root",centmin,centmax),"recreate");
+    TH1D * signalJetEphoE = new TH1D(Form("signalJetEphoE_cent%d_%d",centmin,centmax),"JetPt/PhoE title;yaxis title",16,0,2);
     TH1D * mix_signalJetEphoE = new TH1D("mix_signalJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
     TH1D * sidebandJetEphoE = new TH1D("sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
     TH1D * mix_sidebandJetEphoE = new TH1D("mix_sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
@@ -50,7 +50,7 @@ void analysis::Loop(int centmin, int centmax)
 
     Long64_t nbytes = 0, nb = 0;
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
-        //if (jentry > 10000) break; //to check earlier
+        if (jentry > 1000) break; //to check earlier
         Long64_t ientry = LoadTree(jentry);
         if (jentry%10000==0) cout<< jentry << " out of " << nentries << endl ;
         if (ientry < 0) break;
@@ -63,7 +63,7 @@ void analysis::Loop(int centmin, int centmax)
 
         if (signal) {
         sig_nphotons++;
-        if(hiBin>20) continue;  //should I modify for each centrality bin cut, or another loop to do all at once?
+        if(hiBin>=centmax || hiBin<centmin) continue;  //should I modify for each centrality bin cut, or another loop to do all at once?
 
 
         for(int ijet = 0 ; ijet < njet ; ijet++) {
@@ -123,7 +123,7 @@ void analysis::Loop(int centmin, int centmax)
 
 int main(int argc, char *argv[])
 {
-    analysis * ana = new analysis(std::atoi(argv[0]),std::atoi(argv[1]));
-    ana->Loop();
+    analysis * ana = new analysis();
+    ana->Loop(std::atoi(argv[1]),std::atoi(argv[2]));
     return 0;
 }
