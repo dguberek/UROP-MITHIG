@@ -1,4 +1,4 @@
-//this code creates the histogram for the lowest centrality bin (hiBin<20) and "signal" photons
+//this code attemps to create fig. 7 but has many errors
 #define analysis_cxx
 #include "analysis.h"
 #include <TH2.h>
@@ -62,6 +62,7 @@ void analysis::Loop()
     TH1D * mix_signalJetEphoE[4] = new TH1D[4]("mix_signalJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
     TH1D * sidebandJetEphoE[4] = new TH1D[4]("sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
     TH1D * mix_sidebandJetEphoE[4] = new TH1D[4]("mix_sidebandJetEphoE","JetPt/PhoE title;yaxis title",16,0,2);
+    TH1D * fig7[4] = new TH1D[4]("fig7","JetPt/PhoE title;yaxis title",16,0,2)
     //TH1D * rhoR = new TH1D("rhoR","title;xaxis title;yaxis title",20,0,1);
     
     Long64_t nentries = fChain->GetEntriesFast();
@@ -163,8 +164,12 @@ void analysis::Loop()
             sidebandJetEphoE[iBin]->Scale(1.0/(side_nphotons*(2.0/16.0)));
             mix_sidebandJetEphoE[iBin]->Scale(1.0/(side_nphotons*(2.0/16.0)));
         }
+        
+        
+        
 
 //for a=signal-signalmix do I loop through each histogram and subtract, or how do i implement? (already have array of purities)
+        //sum a->Add(signal, (-1)*signalmix)
     
     }
     
