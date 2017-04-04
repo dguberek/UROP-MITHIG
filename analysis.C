@@ -1,4 +1,4 @@
-//this code creates the histogram for the lowest centrality bin (hiBin<20) and "signal" photons
+//this code creates the histogram for all centrality bins
 #define analysis_cxx
 #include "analysis.h"
 #include <TH2.h>
@@ -117,7 +117,6 @@ void analysis::Loop(int centmin, int centmax)
     outputfile->Write();
     outputfile->Close();
     
-    //how is the outputfile filled with all the generated data?
 }
 
 
