@@ -58,18 +58,18 @@ void drawfig7()
         sidebandJetEphoE[icent] = (TH1D*) _file0->Get(Form("sidebandJetEphoE_cent%d_%d",centmins[icent],centmaxs[icent]));
         mix_sidebandJetEphoE[icent] = (TH1D*) _file0->Get(Form("mix_sidebandJetEphoE_cent%d_%d",centmins[icent],centmaxs[icent]));
         
-        mix_signalJetEphoE[icent]->Scale(-1); // make this negative, so when added it's subtracted
+        mix_signalJetEphoE[icent]->Scale(-1.0); // make this negative, so when added it's subtracted
         signalJetEphoE[icent]->Add(mix_signalJetEphoE[icent]);
         
-        mix_sidebandJetEphoE[icent]->Scale(-1); // make this negative, so when added it's subtracted
+        mix_sidebandJetEphoE[icent]->Scale(-1.0); // make this negative, so when added it's subtracted
         sidebandJetEphoE[icent]->Add(mix_sidebandJetEphoE[icent]);
         
         //purities
         purities[icent] = getpurity(60.0, centmins[icent], false);
         
         
-        signalJetEphoE[icent]->Scale(1/purities[icent]);
-        sidebandJetEphoE[icent]->Scale(-1*(1-purities[icent])/purities[icent]);
+        signalJetEphoE[icent]->Scale(1.0/purities[icent]);
+        sidebandJetEphoE[icent]->Scale(-1.0*(1.0-purities[icent])/purities[icent]);
         signalJetEphoE[icent]->Add(sidebandJetEphoE[icent]);
         
         signalJetEphoE[icent]->Draw();
